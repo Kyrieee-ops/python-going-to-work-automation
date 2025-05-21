@@ -8,26 +8,25 @@ from dotenv import load_dotenv
 import os
 
 
-options = Options() #optionsの呼び出し
-options.page_load_strategy = 'normal' #ページ全体がロードするまで待機
-# ブラウザを最大化した状態で起動するオプションを追加
-options.add_argument('--start-maximized')
+def init_browser():
+    options = Options() #optionsの呼び出し
+    options.page_load_strategy = 'normal' #ページ全体がロードするまで待機
+    # ブラウザを最大化した状態で起動するオプションを追加
+    options.add_argument('--start-maximized')
+    options.add_argument('--enable-webgl')  # WebGLを有効化
+    options.add_argument('--ignore-gpu-blocklist')
+    
+    return webdriver.Chrome(options=options) # PATHが通っていればこれでOK
 
-options.add_argument('--enable-webgl')  # WebGLを有効化
-options.add_argument('--ignore-gpu-blocklist')
-browser = webdriver.Chrome(options=options)  # PATHが通っていればこれでOK
-
-load_dotenv()  # .envファイルを読み込み
-
-# 認証情報の取得
-user_email_value = os.getenv("JOBCAN_EMAIL")
-user_clientcode_value = os.getenv("JOBCAN_CLIENT_CODE")
-user_password_value = os.getenv("JOBCAN_PASSWORD")
-
-def main():
-    target_url = "https://id.jobcan.jp/users/sign_in"
-
+def login(browser):
     try:
+        target_url = "https://id.jobcan.jp/users/sign_in"
+        
+        # 認証情報の取得
+        user_email_value = os.getenv("JOBCAN_EMAIL")
+        user_clientcode_value = os.getenv("JOBCAN_CLIENT_CODE")
+        user_password_value = os.getenv("JOBCAN_PASSWORD")
+        
         #ブラウザオープン
         browser.get(target_url) 
 
@@ -51,14 +50,39 @@ def main():
         login_button = browser.find_element(By.NAME, "commit")
         login_button.click()
 
-        sleep(60)
+        sleep(5)
         print("ログイン処理が完了しました")
+        return True
 
     except Exception as e:
         print(f"エラーが発生しました: {e}")
     finally:
         pass
 
+def attendance(browser):
+    attendance_link = browser.find_element(By.LINK_TEXT, "勤怠")
+    attendance_link.click()
+    print("勤怠入力画面に遷移しました")
+    sleep(5) # 後で消す
+    
+    # stamp_link = browser.find_element(By.LINK_TEXT, "打刻修正")
+    stamp_link = browser.find_element(By.XPATH, '//*[@id="sidemenu"]/div[2]/div/a[2]')
+    stamp_link.click()
+    sleep(5)
+    print("打刻修正画面に遷移しました")
+    
+    
+# メイン処理フロー
+def main():
+    browser = init_browser()
+    # ログイン処理に成功したら、勤怠入力処理を行う
+    try:
+        if login(browser):
+            attendance(browser)  # ログイン成功時のみ勤怠処理実行
+    finally:
+        browser.quit()  # 必ずブラウザを閉じる
+
 # main関数を呼び出す
 if __name__ == "__main__":
+    load_dotenv()  # 環境変数読み込み
     main()
