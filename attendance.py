@@ -7,6 +7,8 @@ from selenium.webdriver.common.keys import Keys
 from dotenv import load_dotenv
 import os
 
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 def init_browser():
     options = Options() #optionsの呼び出し
@@ -50,7 +52,7 @@ def login(browser):
         login_button = browser.find_element(By.NAME, "commit")
         login_button.click()
 
-        sleep(5)
+        sleep(1)
         print("ログイン処理が完了しました")
         return True
 
@@ -63,13 +65,37 @@ def attendance(browser):
     attendance_link = browser.find_element(By.LINK_TEXT, "勤怠")
     attendance_link.click()
     print("勤怠入力画面に遷移しました")
-    sleep(5) # 後で消す
+    sleep(1) # 後で消す
     
-    # stamp_link = browser.find_element(By.LINK_TEXT, "打刻修正")
-    stamp_link = browser.find_element(By.XPATH, '//*[@id="sidemenu"]/div[2]/div/a[2]')
-    stamp_link.click()
-    sleep(5)
+    try:
+        
+        target_url = "https://ssl.jobcan.jp/employee/adit/modify/"
+        # # base_url = browser.current_url.split("/employee")[0]
+        # # direct_url = f"{base_url}/employee/adit/modify/"
+        browser.get(target_url)
+        
+        # 待機処理
+        WebDriverWait(browser, 15).until(
+            lambda d: "/adit/modify" in d.current_url and
+                     d.execute_script("return document.readyState") == "complete"
+        )     
+
+        sleep(10)
+        print("打刻修正ページに直接アクセスしました")
+        # browser.save_screenshot('sucess.png')
+
+        
+    except Exception as e:
+        print(f"エラー発生: {e}")
+        browser.save_screenshot('error.png')
+        return False
+    
+
+    # sleep(0.5)
+    # stamp_link.click()
+
     print("打刻修正画面に遷移しました")
+
     
     
 # メイン処理フロー
