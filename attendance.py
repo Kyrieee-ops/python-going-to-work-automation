@@ -83,20 +83,21 @@ def attendance(browser):
         sleep(10)
         print("打刻修正ページに直接アクセスしました")
         # browser.save_screenshot('sucess.png')
+        
+        working_time = browser.find_element(By.NAME, "time")
+        working_time.send_keys("0900")
+        print("出勤時刻を入力しました")
+        
+        button = browser.find_element(By.ID, "insert_button")
+        button.click()
+        print("打刻処理が完了しました")
+        # browser.save_screenshot('sucess.png')
 
         
     except Exception as e:
         print(f"エラー発生: {e}")
         browser.save_screenshot('error.png')
         return False
-    
-
-    # sleep(0.5)
-    # stamp_link.click()
-
-    print("打刻修正画面に遷移しました")
-
-    
     
 # メイン処理フロー
 def main():
