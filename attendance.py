@@ -52,7 +52,6 @@ def login(browser):
         login_button = browser.find_element(By.NAME, "commit")
         login_button.click()
 
-        sleep(1)
         print("ログイン処理が完了しました")
         return True
 
@@ -65,7 +64,6 @@ def attendance(browser):
     attendance_link = browser.find_element(By.LINK_TEXT, "勤怠")
     attendance_link.click()
     print("勤怠入力画面に遷移しました")
-    sleep(1) # 後で消す
     
     try:
         
@@ -80,7 +78,6 @@ def attendance(browser):
                      d.execute_script("return document.readyState") == "complete"
         )     
 
-        sleep(10)
         print("打刻修正ページに直接アクセスしました")
         # browser.save_screenshot('sucess.png')
         
