@@ -73,6 +73,13 @@ def attendance(browser):
         browser.get(target_url)
         
         # 待機処理
+        '''
+        - lambda関数の引数として`d`に`browser`を受け取る
+        - d.current_urlとd.execute_scriptはbrowser.current_url, browser.execute_scriptという意味になる
+        - d と書くことで「WebDriverインスタンスであること」をコード上で明確にする
+        - "/adit/modify" in d.current_url でURLのパスに"/adit/modify"が含まれているか？
+        - d.execute_script("return document.readyState") == "complete"でJavaScriptのページ読み込みが完了していること
+        '''
         WebDriverWait(browser, 15).until(
             lambda d: "/adit/modify" in d.current_url and
                      d.execute_script("return document.readyState") == "complete"
