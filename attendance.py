@@ -61,33 +61,34 @@ def login(browser):
         pass
 
 def attendance(browser):
-    attendance_link = browser.find_element(By.LINK_TEXT, "勤怠")
-    attendance_link.click()
-    print("勤怠入力画面に遷移しました")
     
     try:
-        
-        target_url = "https://ssl.jobcan.jp/employee/adit/modify/"
-        # # base_url = browser.current_url.split("/employee")[0]
-        # # direct_url = f"{base_url}/employee/adit/modify/"
-        browser.get(target_url)
-        
-        # 待機処理
-        '''
-        - lambda関数の引数として`d`に`browser`を受け取る
-        - d.current_urlとd.execute_scriptはbrowser.current_url, browser.execute_scriptという意味になる
-        - d と書くことで「WebDriverインスタンスであること」をコード上で明確にする
-        - "/adit/modify" in d.current_url でURLのパスに"/adit/modify"が含まれているか？
-        - d.execute_script("return document.readyState") == "complete"でJavaScriptのページ読み込みが完了していること
-        '''
-        WebDriverWait(browser, 15).until(
-            lambda d: "/adit/modify" in d.current_url and
-                     d.execute_script("return document.readyState") == "complete"
-        )     
+        # 現在のウィンドウハンドルを記録
+        original_window = browser.current_window_handle
 
-        print("打刻修正ページに直接アクセスしました")
-        # browser.save_screenshot('sucess.png')
-        
+        # 勤怠ページへ遷移
+        attendance_link = browser.find_element(By.LINK_TEXT, "勤怠")
+        attendance_link.click()
+        print("勤怠入力画面に遷移しました")
+       
+        # 新しいウィンドウ/タブに切り替え
+        WebDriverWait(browser, 10).until(
+            lambda d: len(d.window_handles) > 1
+        )
+        browser.switch_to.window(browser.window_handles[1])
+        print("新しいタブに切り替えました")
+
+        # ここで新しいタブの要素を操作
+
+        # elem = WebDriverWait(browser, 15).until(
+        #     EC.element_to_be_clickable((By.XPATH, '//*[@id="sidemenu"]/div[2]/div/a[2]'))
+        # )
+        modify = browser.find_element(By.XPATH, '//*[@id="sidemenu"]/div[2]/div/a[2]')
+        modify.click()
+        print("打刻修正リンクをクリックしました")
+        sleep(3)
+        browser.save_screenshot('sucess_1.png')
+
         working_time = browser.find_element(By.NAME, "time")
         working_time.send_keys("0900")
         print("出勤時刻を入力しました")
@@ -95,11 +96,11 @@ def attendance(browser):
         button = browser.find_element(By.ID, "insert_button")
         button.click()
         print("打刻処理が完了しました")
-        # browser.save_screenshot('sucess.png')
+        browser.save_screenshot('sucess_2.png')
 
         
     except Exception as e:
-        print(f"エラー発生: {e}")
+        print(f"勤怠処理でエラーが発生しました: {str(e)}")
         browser.save_screenshot('error.png')
         return False
     
