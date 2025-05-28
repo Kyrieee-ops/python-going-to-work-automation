@@ -79,17 +79,20 @@ def attendance(browser):
         print("新しいタブに切り替えました")
 
         # ここで新しいタブの要素を操作
+        # 打刻修正画面の操作前に待機処理を入れておかないとエラーになる可能性があるため、5秒待機
+        modify = WebDriverWait(browser, 5).until(
+            EC.element_to_be_clickable((By.XPATH, '//*[@id="sidemenu"]/div[2]/div/a[2]'))
+        )
+        # modify = browser.find_element(By.XPATH, '//*[@id="sidemenu"]/div[2]/div/a[2]')
 
-        # elem = WebDriverWait(browser, 15).until(
-        #     EC.element_to_be_clickable((By.XPATH, '//*[@id="sidemenu"]/div[2]/div/a[2]'))
-        # )
-        modify = browser.find_element(By.XPATH, '//*[@id="sidemenu"]/div[2]/div/a[2]')
         modify.click()
         print("打刻修正リンクをクリックしました")
-        sleep(3)
         browser.save_screenshot('sucess_1.png')
 
-        working_time = browser.find_element(By.NAME, "time")
+        # 打刻修正リンククリック後、テキストボックスに入力できるまでに時間がかかるため、5秒待機処理
+        working_time = WebDriverWait(browser, 5).until(
+            EC.presence_of_element_located((By.NAME, "time"))
+        )
         working_time.send_keys("0900")
         print("出勤時刻を入力しました")
         
@@ -97,6 +100,7 @@ def attendance(browser):
         button.click()
         print("打刻処理が完了しました")
         browser.save_screenshot('sucess_2.png')
+        return True
 
         
     except Exception as e:
