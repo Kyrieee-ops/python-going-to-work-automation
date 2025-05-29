@@ -1,9 +1,6 @@
-from logging import log
 from selenium import webdriver
-from time import sleep
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
 from dotenv import load_dotenv
 import os
 
